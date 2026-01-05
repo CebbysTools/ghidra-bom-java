@@ -14,8 +14,258 @@
     <packaging>pom</packaging>
     <description>Bill of Materials for Ghidra dependencies</description>
 
+    <properties>
+        <ghidra.version>11.4.2</ghidra.version>
+        <ghidra-home.path>C:\Tools\Ghidra\Ghidra 11.4.2</ghidra-home.path>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Ghidra Framework -->
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Framework-Utility</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Framework-Generic</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Framework-SoftwareModeling</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Framework-Docking</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Framework-Graph</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Framework-Project</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+
+            <!-- Ghidra Features -->
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Features-Base</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Features-Decompiler</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Features-BytePatterns</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+
+            <!-- Ghidra Processors -->
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Processors-x86</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ghidra</groupId>
+                <artifactId>Processors-ARM</artifactId>
+                <version>${ghidra.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
+            <!-- Install Ghidra JARs to local Maven repository -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <!-- Framework JARs -->
+                    <execution>
+                        <id>install-framework-utility</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Framework/Utility/lib/Utility.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Framework-Utility</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-framework-generic</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Framework/Generic/lib/Generic.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Framework-Generic</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-framework-softwaremodeling</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Framework/SoftwareModeling/lib/SoftwareModeling.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Framework-SoftwareModeling</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-framework-docking</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Framework/Docking/lib/Docking.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Framework-Docking</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-framework-graph</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Framework/Graph/lib/Graph.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Framework-Graph</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-framework-project</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Framework/Project/lib/Project.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Framework-Project</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+
+                    <!-- Features JARs -->
+                    <execution>
+                        <id>install-features-base</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Features/Base/lib/Base.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Features-Base</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-features-decompiler</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Features/Decompiler/lib/Decompiler.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Features-Decompiler</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-features-bytepatterns</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Features/BytePatterns/lib/BytePatterns.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Features-BytePatterns</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+
+                    <!-- Processors JARs -->
+                    <execution>
+                        <id>install-processors-x86</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Processors/x86/lib/x86.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Processors-x86</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-processors-arm</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${ghidra-home.path}/Ghidra/Processors/ARM/lib/ARM.jar</file>
+                            <groupId>ghidra</groupId>
+                            <artifactId>Processors-ARM</artifactId>
+                            <version>${ghidra.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Enforce that ghidra-home.path is defined -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -23,6 +273,7 @@
                 <executions>
                     <execution>
                         <id>enforce-ghidra-home-path</id>
+                        <phase>validate</phase>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -63,26 +314,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>ghidra</id>
-            <activation>
-                <property>
-                    <name>ghidra.version</name>
-                </property>
-            </activation>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>ghidra</groupId>
-                        <artifactId>configurations</artifactId>
-                        <version>${ghidra.version}</version>
-                        <scope>system</scope>
-                        <systemPath>${ghidra-home.path}/Ghidra/Configurations/Public_Release/lib/Public_Release.jar</systemPath>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-        </profile>
-    </profiles>
 </project>

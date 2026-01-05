@@ -11,13 +11,13 @@
     </parent>
 
     <artifactId>ghidra-bom-test</artifactId>
-    <packaging>pom</packaging>
     <description>Parent module for testing Ghidra BOM with different Ghidra versions</description>
 
-    <modules>
-        <!-- Add submodules here for testing different Ghidra versions -->
-        <!-- Example: <module>ghidra-11.0-test</module> -->
-    </modules>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -32,6 +32,25 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- Import Ghidra dependencies from BOM (versions managed by BOM) -->
+        <dependency>
+            <groupId>ghidra</groupId>
+            <artifactId>Framework-Utility</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ghidra</groupId>
+            <artifactId>Framework-Generic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ghidra</groupId>
+            <artifactId>Framework-SoftwareModeling</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ghidra</groupId>
+            <artifactId>Features-Base</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -45,7 +64,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -54,7 +73,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.5.2</version>
             </plugin>
         </plugins>
     </build>
