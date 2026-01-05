@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Get Ghidra URL (1.12)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.github/scripts/python/get_ghidra_artifact_url.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--version",
+                "12.0"
+            ],
+            "justMyCode": true
+        }
+    ]
+}
