@@ -41,9 +41,9 @@ public class GhidraJarIndexer extends AbstractMojo {
     private MavenProject project;
 
     /**
-     * The Ghidra version to use for indexed artifacts.
+     * The Ghidra version to use for indexed artifacts (can be auto-detected).
      */
-    @Parameter(property = "ghidra.version", defaultValue = "12.0")
+    @Parameter(property = "ghidra.version")
     private String ghidraVersion;
 
     @Override
@@ -52,6 +52,14 @@ public class GhidraJarIndexer extends AbstractMojo {
         // Validate required properties
         validateProperties();
 
+        // Detect Ghidra version if not provided
+        if (ghidraVersion == null || ghidraVersion.trim().isEmpty()) {
+            ghidraVersion = detectGhidraVersion();
+            getLog().info("Auto-detected Ghidra version: " + ghidraVersion);
+        } else {
+            getLog().info("Using configured Ghidra version: " + ghidraVersion);
+        }
+
         // Index JAR files
         List<JarInfo> jarFiles = indexGhidraJars();
 
@@ -59,6 +67,26 @@ public class GhidraJarIndexer extends AbstractMojo {
         if (!jarFiles.isEmpty()) {
             attachJarsToProject(jarFiles);
         }
+    }
+
+    /**
+     * Detects the Ghidra version from the installation directory.
+     *
+     * @return The detected Ghidra version string
+     * @throws MojoExecutionException if version cannot be detected
+     */
+    private String detectGhidraVersion() throws MojoExecutionException {
+        // TODO: Implement actual version detection logic
+        // This should read version information from Ghidra installation
+        // Possible sources:
+        // - application.properties file
+        // - version.properties file
+        // - Parse from directory name or manifest files
+
+        getLog().debug("Detecting Ghidra version from: " + ghidraHomePath);
+
+        // Temporary hardcoded version - will be replaced with actual detection
+        return "11.4.2";
     }
 
     private void validateProperties() throws MojoExecutionException {
