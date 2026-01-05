@@ -7,5 +7,27 @@ on:
 
     push:
         branches: [release/**]
+jobs:
+    setup-and-verify:
+        runs-on: ubuntu-latest
 
-jobs: []
+        steps:
+            # 1. Essential: Checkout the repository so the runner sees your scripts
+            - name: Checkout Repository
+              uses: actions/checkout@v6
+
+            # 2. Run your local action
+            - name: Setup Ghidra
+              uses: ./.github/actions/setup-ghidra-action
+              with:
+                  ghidra-version: "12.0"
+
+            # # 3. Final Verification (Individual Step)
+            # - name: Check Ghidra Executable
+            #   run: |
+            #       if [ -f ".ghidra/ghidraRun" ]; then
+            #         echo "Success: Ghidra executable found."
+            #       else
+            #         echo "Error: Ghidra executable missing!"
+            #         exit 1
+            #       fi
