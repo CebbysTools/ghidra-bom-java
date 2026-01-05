@@ -6,7 +6,9 @@ TOKEN=$2
 
 # 1. Download directly using the output of the Python script
 echo "Searching for Ghidra version: '$VERSION'"
-DOWNLOAD_URL=$(python3 "./.github/scripts/python/get_ghidra_artifact_url.py" --version "$VERSION" --token "$TOKEN")
+DOWNLOAD_URL=$(python3 "./.github/scripts/python/get_ghidra_artifact_url.py"\
+    --version "$VERSION"\
+    --token "$TOKEN")
 
 if [ -z "$DOWNLOAD_URL" ]; then
     echo "Error: Failed to identify Ghidra artifact URL for version '$VERSION'"
