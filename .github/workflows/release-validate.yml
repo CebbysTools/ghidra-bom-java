@@ -18,9 +18,17 @@ jobs:
 
       # 2. Run your local action
       - name: Setup Ghidra
+        id: ghidra-setup
         uses: ./.github/actions/setup-ghidra-action
         with:
           ghidra-version: "12.0"
+
+      - name: Verify Output Path
+        shell: bash
+        run: |
+          echo "Ghidra is installed at: ${{ steps.ghidra-setup.outputs.ghidra-home-path }}"
+          # Check if the folder exists at that absolute path
+          ls -d "${{ steps.ghidra-setup.outputs.ghidra-home-path }}"
 
       # # 3. Final Verification (Individual Step)
       # - name: Check Ghidra Executable
