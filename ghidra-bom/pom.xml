@@ -14,6 +14,56 @@
     <packaging>pom</packaging>
     <description>Bill of Materials for Ghidra dependencies</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-ghidra-home-path</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>ghidra-home.path</property>
+                                    <message>
+                                        ========================================
+                                        ERROR: ghidra-home.path is not defined!
+                                        ========================================
+
+                                        The 'ghidra-home.path' property must be defined when using ghidra-bom.
+
+                                        Please define it in one of the following ways:
+
+                                        1. In your project's pom.xml:
+                                           &lt;properties&gt;
+                                               &lt;ghidra-home.path&gt;/path/to/ghidra&lt;/ghidra-home.path&gt;
+                                           &lt;/properties&gt;
+
+                                        2. As a Maven command line property:
+                                           mvn clean install -Dghidra-home.path=/path/to/ghidra
+
+                                        3. In your Maven settings.xml (~/.m2/settings.xml):
+                                           &lt;properties&gt;
+                                               &lt;ghidra-home.path&gt;/path/to/ghidra&lt;/ghidra-home.path&gt;
+                                           &lt;/properties&gt;
+
+                                        ========================================
+                                    </message>
+                                </requireProperty>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>ghidra</id>
