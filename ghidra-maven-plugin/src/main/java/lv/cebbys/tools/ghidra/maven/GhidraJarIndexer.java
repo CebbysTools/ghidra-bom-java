@@ -3,10 +3,13 @@ package lv.cebbys.tools.ghidra.maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.installer.ArtifactInstaller;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -47,6 +50,18 @@ public class GhidraJarIndexer extends AbstractMojo {
      */
     @Parameter(property = "ghidra.version")
     private String ghidraVersion;
+
+    /**
+     * Local Maven repository.
+     */
+    @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
+    private ArtifactRepository localRepository;
+
+    /**
+     * Artifact installer component.
+     */
+    @Component
+    private ArtifactInstaller installer;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -153,27 +168,17 @@ public class GhidraJarIndexer extends AbstractMojo {
         return jarFiles;
     }
 
-    private void attachJarsToProject(List<JarInfo> jarFiles) {
-        getLog().info("Attaching " + jarFiles.size() + " Ghidra JAR files to project");
+    private void attachJarsToProject(List<JarInfo> jarFiles) throws MojoExecutionException {
+        getLog().info("Installing " + jarFiles.size() + " Ghidra JAR files to local Maven repository");
 
+        int installedCount = 0;
         for (JarInfo jarInfo : jarFiles) {
             try {
                 // Create artifact identifier from JAR info
                 String artifactId = generateArtifactId(jarInfo);
                 String groupId = "ghidra." + jarInfo.getCategory().toLowerCase();
 
-                // Create Maven dependency
-                Dependency dependency = new Dependency();
-                dependency.setGroupId(groupId);
-                dependency.setArtifactId(artifactId);
-                dependency.setVersion(ghidraVersion);
-                dependency.setScope("system");
-                dependency.setSystemPath(jarInfo.getAbsolutePath());
-
-                // Add to project model dependencies
-                project.getModel().addDependency(dependency);
-
-                // Also create and add artifact for runtime
+                // Create Maven artifact
                 DefaultArtifactHandler handler = new DefaultArtifactHandler("jar");
                 Artifact artifact = new DefaultArtifact(
                     groupId,
@@ -185,17 +190,31 @@ public class GhidraJarIndexer extends AbstractMojo {
                     handler
                 );
                 artifact.setFile(new File(jarInfo.getAbsolutePath()));
+
+                // Install to local repository
+                installer.install(artifact.getFile(), artifact, localRepository);
+
+                // Add dependency to project model
+                Dependency dependency = new Dependency();
+                dependency.setGroupId(groupId);
+                dependency.setArtifactId(artifactId);
+                dependency.setVersion(ghidraVersion);
+                project.getModel().addDependency(dependency);
+
+                // Add to project artifacts
                 project.getArtifacts().add(artifact);
 
-                getLog().debug("Attached JAR: " + groupId + ":" + artifactId + ":" + ghidraVersion);
+                getLog().debug("Installed JAR: " + groupId + ":" + artifactId + ":" + ghidraVersion);
+                installedCount++;
 
             } catch (Exception e) {
-                getLog().warn("Failed to attach JAR: " + jarInfo.getFileName() + " - " + e.getMessage());
+                getLog().warn("Failed to install JAR: " + jarInfo.getFileName() + " - " + e.getMessage());
             }
         }
 
-        getLog().info("Successfully attached Ghidra JARs as external libraries");
-        getLog().info("IntelliJ will display these under External Libraries after Maven reimport");
+        getLog().info("Successfully installed " + installedCount + " Ghidra JARs to local Maven repository");
+        getLog().info("Location: " + localRepository.getBasedir());
+        getLog().info("IntelliJ will display these in External Libraries after Maven reimport");
     }
 
     private void writeIntelliJLibraries(List<JarInfo> jarFiles) throws MojoExecutionException {
