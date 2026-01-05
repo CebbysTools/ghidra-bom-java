@@ -28,8 +28,7 @@ import java.util.stream.Stream;
  * - ghidra.version: The version of Ghidra to use (must be 12.0)
  * - ghidra-home.path: The path to the Ghidra installation directory
  */
-@Mojo(name = "index-jars", defaultPhase = LifecyclePhase.INSTALL)
-@Execute(goal = "index-jars")
+@Mojo(name = "index-jars", defaultPhase = LifecyclePhase.INITIALIZE, requiresProject = true)
 public class GhidraJarIndexer extends AbstractMojo {
     /**
      * The path to the Ghidra installation directory.

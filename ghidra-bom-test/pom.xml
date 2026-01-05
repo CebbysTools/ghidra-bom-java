@@ -63,6 +63,7 @@
                 <executions>
                     <execution>
                         <id>index-ghidra-jars</id>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>index-jars</goal>
                         </goals>
