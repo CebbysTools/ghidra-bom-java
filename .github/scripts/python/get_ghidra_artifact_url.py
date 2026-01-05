@@ -15,6 +15,7 @@ PARSER.add_argument(
 )
 PARSER.add_argument(
     name_or_flags="--token",
+    required=False,
     help="GitHub Personal Access Token"
 )
 
