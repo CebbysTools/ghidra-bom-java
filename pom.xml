@@ -5,27 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>lv.cebbys.tools</groupId>
-    <artifactId>ghidra-bom</artifactId>
+    <artifactId>ghidra-bom-parent</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
+    <description>Parent project for Ghidra BOM and test modules</description>
 
-    <profiles>
-        <profile>
-            <id>ghidra</id>
-            <activation>
-                <property>
-                    <name>ghidra.version</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>ghidra</groupId>
-                    <artifactId>configurations</artifactId>
-                    <version>${ghidra.version}</version>
-                    <scope>system</scope>
-                    <systemPath>${ghidra-home.path}/Ghidra/Configurations/Public_Release/lib/Public_Release.jar</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    <modules>
+        <module>ghidra-bom</module>
+        <module>ghidra-bom-test</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
 </project>
