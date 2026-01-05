@@ -3,9 +3,11 @@ package lv.cebbys.tools.ghidra.maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -27,6 +29,7 @@ import java.util.stream.Stream;
  * - ghidra-home.path: The path to the Ghidra installation directory
  */
 @Mojo(name = "index-jars", defaultPhase = LifecyclePhase.INSTALL)
+@Execute(goal = "index-jars")
 public class GhidraJarIndexer extends AbstractMojo {
     /**
      * The path to the Ghidra installation directory.
@@ -159,7 +162,18 @@ public class GhidraJarIndexer extends AbstractMojo {
                 String artifactId = generateArtifactId(jarInfo);
                 String groupId = "ghidra." + jarInfo.getCategory().toLowerCase();
 
-                // Create Maven artifact
+                // Create Maven dependency
+                Dependency dependency = new Dependency();
+                dependency.setGroupId(groupId);
+                dependency.setArtifactId(artifactId);
+                dependency.setVersion(ghidraVersion);
+                dependency.setScope("system");
+                dependency.setSystemPath(jarInfo.getAbsolutePath());
+
+                // Add to project model dependencies
+                project.getModel().addDependency(dependency);
+
+                // Also create and add artifact for runtime
                 DefaultArtifactHandler handler = new DefaultArtifactHandler("jar");
                 Artifact artifact = new DefaultArtifact(
                     groupId,
@@ -170,11 +184,7 @@ public class GhidraJarIndexer extends AbstractMojo {
                     null,
                     handler
                 );
-
-                // Set the file
                 artifact.setFile(new File(jarInfo.getAbsolutePath()));
-
-                // Attach artifact to project
                 project.getArtifacts().add(artifact);
 
                 getLog().debug("Attached JAR: " + groupId + ":" + artifactId + ":" + ghidraVersion);
@@ -185,6 +195,7 @@ public class GhidraJarIndexer extends AbstractMojo {
         }
 
         getLog().info("Successfully attached Ghidra JARs as external libraries");
+        getLog().info("IntelliJ will display these under External Libraries after Maven reimport");
     }
 
     private String generateArtifactId(JarInfo jarInfo) {
