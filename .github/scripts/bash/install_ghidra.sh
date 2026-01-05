@@ -47,4 +47,4 @@ fi
 # -a: Include hidden files (like .ghidra)
 # -L 3: Show depth up to 3 levels
 # -I: Ignore the large .git folder to keep the log clean
-tree -LaI 3 -F .ghidra
+tree -LaI 1 -F .ghidra
