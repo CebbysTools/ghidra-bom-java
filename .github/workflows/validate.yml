@@ -1,0 +1,24 @@
+name: Validate Release Branch CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [release/**]
+  push:
+    branches: [release/**]
+
+jobs:
+  setup-and-verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Essential: Checkout the repository so the runner sees your scripts
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      # 2. Run your local action
+      - name: Setup Ghidra
+        id: ghidra-setup
+        uses: ./.github/actions/setup-ghidra-action
+        with:
+          ghidra-version: 12.0
