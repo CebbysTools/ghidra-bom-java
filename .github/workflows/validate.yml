@@ -10,6 +10,9 @@ on:
 jobs:
   setup-and-verify:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ghidra-version: ["12.0", "11.4.3", "10.4"]
 
     steps:
       # 1. Essential: Checkout the repository so the runner sees your scripts
@@ -21,4 +24,4 @@ jobs:
         id: ghidra-setup
         uses: ./.github/actions/setup-ghidra-action
         with:
-          ghidra-version: 12.0
+          ghidra-version: ${{ matrix.ghidra-version }}
