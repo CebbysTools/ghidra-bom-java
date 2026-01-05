@@ -9,12 +9,12 @@ PARSER = Argparse.ArgumentParser(
     description="Get the Ghidra download URL by artifact version."
 )
 PARSER.add_argument(
-    name_or_flags="--version",
+    "--version",
     required=True,
     help="Ghidra version (e.g., 12.0)"
 )
 PARSER.add_argument(
-    name_or_flags="--token",
+    "--token",
     required=False,
     help="GitHub Personal Access Token"
 )
@@ -25,6 +25,7 @@ class Arguments:
 
 def main():
     arguments = get_arguments()
+    print(arguments)
     
 def get_arguments() -> Arguments:
     return get_raw_arguments()
