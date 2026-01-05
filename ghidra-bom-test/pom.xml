@@ -60,9 +60,17 @@
                 <groupId>lv.cebbys.tools</groupId>
                 <artifactId>ghidra-maven-plugin</artifactId>
                 <version>1.0.0</version>
-                <configuration>
-                    <ghidraHomePath>C:\Tools\Ghidra\Ghidra 11.4.2</ghidraHomePath>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>index-ghidra-jars</id>
+                        <goals>
+                            <goal>index-jars</goal>
+                        </goals>
+                        <configuration>
+                            <ghidraHomePath>C:\Tools\Ghidra\Ghidra 11.4.2</ghidraHomePath>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
