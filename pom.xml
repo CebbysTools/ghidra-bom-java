@@ -12,6 +12,7 @@
 
     <modules>
         <module>ghidra-bom</module>
+        <module>ghidra-maven-plugin</module>
         <module>ghidra-bom-test</module>
     </modules>
 
