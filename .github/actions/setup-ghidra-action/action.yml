@@ -1,0 +1,28 @@
+name: Setup Ghidra
+description: Downloads and installs Ghidra from the official Ghidra Github project
+inputs:
+  ghidra-version:
+    description: Version of Ghidra to be installed
+    required: true
+
+  github-token:
+    description: "GitHub token for API authentication"
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  ghidra-home-path:
+    description: The absolute path to the installed Ghidra
+    value: a
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Ghidra
+      shell: bash
+      run: |
+        SCRIPT_PATH="./.github/scripts/bash/install_ghidra.sh"
+        chmod +x "$SCRIPT_PATH"
+        "$SCRIPT_PATH" \
+          "${{ inputs.ghidra-version }}" \
+          "${{ inputs.github-token }}"

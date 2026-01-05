@@ -1,0 +1,11 @@
+name: Validate Release Branch CI
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened]
+        branches: [release/**]
+
+    push:
+        branches: [release/**]
+
+jobs: []
