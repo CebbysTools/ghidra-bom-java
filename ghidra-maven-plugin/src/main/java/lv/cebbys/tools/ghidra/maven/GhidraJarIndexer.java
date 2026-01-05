@@ -1,5 +1,8 @@
 package lv.cebbys.tools.ghidra.maven;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -19,20 +22,12 @@ import java.util.stream.Stream;
 
 /**
  * Maven plugin goal that indexes Ghidra JAR files and validates the Ghidra version.
- *
  * This plugin requires two mandatory properties:
  * - ghidra.version: The version of Ghidra to use (must be 12.0)
  * - ghidra-home.path: The path to the Ghidra installation directory
  */
-@Mojo(name = "index-jars", defaultPhase = LifecyclePhase.VALIDATE)
-public class GhidraIndexMojo extends AbstractMojo {
-
-    /**
-     * The Ghidra version to use. Must be 12.0.
-     */
-    @Parameter(property = "ghidra.version", required = true)
-    private String ghidraVersion;
-
+@Mojo(name = "index-jars", defaultPhase = LifecyclePhase.INSTALL)
+public class GhidraJarIndexer extends AbstractMojo {
     /**
      * The path to the Ghidra installation directory.
      */
@@ -46,36 +41,27 @@ public class GhidraIndexMojo extends AbstractMojo {
     private MavenProject project;
 
     /**
-     * Skip the plugin execution.
+     * The Ghidra version to use for indexed artifacts.
      */
-    @Parameter(property = "ghidra.index.skip", defaultValue = "false")
-    private boolean skip;
+    @Parameter(property = "ghidra.version", defaultValue = "12.0")
+    private String ghidraVersion;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (skip) {
-            getLog().info("Skipping Ghidra JAR indexing");
-            return;
-        }
-
+        getLog().info("Indexing Ghidra jars");
         // Validate required properties
         validateProperties();
 
-        // Validate Ghidra version
-        validateGhidraVersion();
-
         // Index JAR files
-        indexGhidraJars();
+        List<JarInfo> jarFiles = indexGhidraJars();
+
+        // Attach JARs as system scope dependencies
+        if (!jarFiles.isEmpty()) {
+            attachJarsToProject(jarFiles);
+        }
     }
 
     private void validateProperties() throws MojoExecutionException {
-        if (ghidraVersion == null || ghidraVersion.trim().isEmpty()) {
-            throw new MojoExecutionException(
-                "Property 'ghidra.version' is required but not defined. " +
-                "Please define it in your pom.xml or pass it as -Dghidra.version=12.0"
-            );
-        }
-
         if (ghidraHomePath == null || ghidraHomePath.trim().isEmpty()) {
             throw new MojoExecutionException(
                 "Property 'ghidra-home.path' is required but not defined. " +
@@ -91,29 +77,7 @@ public class GhidraIndexMojo extends AbstractMojo {
         }
     }
 
-    private void validateGhidraVersion() throws MojoFailureException {
-        getLog().info("Validating Ghidra version: " + ghidraVersion);
-
-        if (!"12.0".equals(ghidraVersion)) {
-            throw new MojoFailureException(
-                String.format(
-                    "========================================%n" +
-                    "ERROR: Invalid Ghidra version!%n" +
-                    "========================================%n%n" +
-                    "Expected version: 12.0%n" +
-                    "Provided version: %s%n%n" +
-                    "This plugin currently only supports Ghidra version 12.0.%n" +
-                    "Please update the 'ghidra.version' property to 12.0.%n" +
-                    "========================================%n",
-                    ghidraVersion
-                )
-            );
-        }
-
-        getLog().info("Ghidra version validation passed: " + ghidraVersion);
-    }
-
-    private void indexGhidraJars() throws MojoExecutionException {
+    private List<JarInfo> indexGhidraJars() throws MojoExecutionException {
         getLog().info("Indexing Ghidra JAR files from: " + ghidraHomePath);
 
         Path ghidraPath = Paths.get(ghidraHomePath, "Ghidra");
@@ -154,6 +118,64 @@ public class GhidraIndexMojo extends AbstractMojo {
 
         // Store jar info in project properties for potential use by other plugins
         project.getProperties().setProperty("ghidra.jars.indexed", String.valueOf(jarFiles.size()));
+
+        return jarFiles;
+    }
+
+    private void attachJarsToProject(List<JarInfo> jarFiles) {
+        getLog().info("Attaching " + jarFiles.size() + " Ghidra JAR files to project");
+
+        for (JarInfo jarInfo : jarFiles) {
+            try {
+                // Create artifact identifier from JAR info
+                String artifactId = generateArtifactId(jarInfo);
+                String groupId = "ghidra." + jarInfo.getCategory().toLowerCase();
+
+                // Create Maven artifact
+                DefaultArtifactHandler handler = new DefaultArtifactHandler("jar");
+                Artifact artifact = new DefaultArtifact(
+                    groupId,
+                    artifactId,
+                    ghidraVersion,
+                    "compile",
+                    "jar",
+                    null,
+                    handler
+                );
+
+                // Set the file
+                artifact.setFile(new File(jarInfo.getAbsolutePath()));
+
+                // Attach artifact to project
+                project.getArtifacts().add(artifact);
+
+                getLog().debug("Attached JAR: " + groupId + ":" + artifactId + ":" + ghidraVersion);
+
+            } catch (Exception e) {
+                getLog().warn("Failed to attach JAR: " + jarInfo.getFileName() + " - " + e.getMessage());
+            }
+        }
+
+        getLog().info("Successfully attached Ghidra JARs as external libraries");
+    }
+
+    private String generateArtifactId(JarInfo jarInfo) {
+        // Generate artifact ID from file name (remove .jar extension)
+        String name = jarInfo.getFileName();
+        if (name.endsWith(".jar")) {
+            name = name.substring(0, name.length() - 4);
+        }
+
+        // Clean up artifact ID (replace spaces and special characters)
+        name = name.replaceAll("[^a-zA-Z0-9.-]", "-");
+
+        // Add category prefix if not already present
+        String category = jarInfo.getCategory().toLowerCase();
+        if (!name.toLowerCase().startsWith(category)) {
+            name = category + "-" + name;
+        }
+
+        return name;
     }
 
     private JarInfo createJarInfo(Path jarPath, Path basePath) {

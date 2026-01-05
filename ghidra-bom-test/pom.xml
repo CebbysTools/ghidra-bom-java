@@ -56,6 +56,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.2</version>
             </plugin>
+            <plugin>
+                <groupId>lv.cebbys.tools</groupId>
+                <artifactId>ghidra-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <ghidraHomePath>C:\Tools\Ghidra\Ghidra 11.4.2</ghidraHomePath>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
