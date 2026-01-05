@@ -68,6 +68,7 @@ public class GhidraJarIndexer extends AbstractMojo {
         // Attach JARs as system scope dependencies
         if (!jarFiles.isEmpty()) {
             attachJarsToProject(jarFiles);
+            writeIntelliJLibraries(jarFiles);
         }
     }
 
@@ -195,6 +196,61 @@ public class GhidraJarIndexer extends AbstractMojo {
 
         getLog().info("Successfully attached Ghidra JARs as external libraries");
         getLog().info("IntelliJ will display these under External Libraries after Maven reimport");
+    }
+
+    private void writeIntelliJLibraries(List<JarInfo> jarFiles) throws MojoExecutionException {
+        File baseDir = project.getBasedir();
+        File ideaDir = new File(baseDir, ".idea");
+        File librariesDir = new File(ideaDir, "libraries");
+
+        if (!librariesDir.exists() && !librariesDir.mkdirs()) {
+            getLog().warn("Could not create .idea/libraries directory");
+            return;
+        }
+
+        getLog().info("Writing IntelliJ library configurations to: " + librariesDir.getAbsolutePath());
+
+        // Group JARs by category
+        java.util.Map<String, List<JarInfo>> groupedJars = jarFiles.stream()
+            .collect(java.util.stream.Collectors.groupingBy(JarInfo::getCategory));
+
+        for (java.util.Map.Entry<String, List<JarInfo>> entry : groupedJars.entrySet()) {
+            String category = entry.getKey();
+            List<JarInfo> jars = entry.getValue();
+
+            String libraryName = "Ghidra_" + category + "_" + ghidraVersion;
+            File libraryFile = new File(librariesDir, libraryName.replace(".", "_") + ".xml");
+
+            try {
+                writeLibraryXml(libraryFile, libraryName, jars);
+                getLog().info("Created library: " + libraryName + " with " + jars.size() + " JARs");
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to write library file: " + libraryFile, e);
+            }
+        }
+
+        getLog().info("Successfully created IntelliJ library configurations");
+        getLog().info("Libraries will appear in External Libraries after IntelliJ restart or project reload");
+    }
+
+    private void writeLibraryXml(File file, String libraryName, List<JarInfo> jars) throws IOException {
+        StringBuilder xml = new StringBuilder();
+        xml.append("<component name=\"libraryTable\">\n");
+        xml.append("  <library name=\"").append(libraryName).append("\">\n");
+        xml.append("    <CLASSES>\n");
+
+        for (JarInfo jar : jars) {
+            String url = "jar://" + jar.getAbsolutePath().replace("\\", "/") + "!/";
+            xml.append("      <root url=\"").append(url).append("\" />\n");
+        }
+
+        xml.append("    </CLASSES>\n");
+        xml.append("    <JAVADOC />\n");
+        xml.append("    <SOURCES />\n");
+        xml.append("  </library>\n");
+        xml.append("</component>\n");
+
+        Files.write(file.toPath(), xml.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     private String generateArtifactId(JarInfo jarInfo) {
