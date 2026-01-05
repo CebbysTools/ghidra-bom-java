@@ -13,12 +13,13 @@ inputs:
 outputs:
   ghidra-home-path:
     description: The absolute path to the installed Ghidra
-    value: a
+    value: ${{ github.workspace }}/.ghidra
 
 runs:
   using: composite
   steps:
     - name: Setup Ghidra
+      id: setup-ghidra
       shell: bash
       run: |
         SCRIPT_PATH="./.github/scripts/bash/install_ghidra.sh"
@@ -26,3 +27,11 @@ runs:
         "$SCRIPT_PATH" \
           "${{ inputs.ghidra-version }}" \
           "${{ inputs.github-token }}"
+
+    - name: Verify Output Path
+      id: verify-ghidra
+      shell: bash
+      run: |
+        echo "Ghidra is installed at: ${{ steps.ghidra_setup.outputs.ghidra-home-path }}"
+        # Check if the folder exists at that absolute path
+        ls -d "${{ steps.ghidra_setup.outputs.ghidra-home-path }}"
