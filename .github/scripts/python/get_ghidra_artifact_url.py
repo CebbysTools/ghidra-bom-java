@@ -1,8 +1,6 @@
 import requests as Requests
 import argparse as Argparse
 import typing as Typing
-import sys as System
-import os as Os
 
 
 PARSER = Argparse.ArgumentParser(
